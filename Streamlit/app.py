@@ -5,38 +5,61 @@ from PIL import Image
 import os
 
 # Set page config
-st.set_page_config(page_title="Wind Turbine Blade Defect Detection", layout="wide")
+st.set_page_config(page_title="WindSightAI: Turbine Blade Defect Detection", layout="wide")
 
 # Sidebar
 st.sidebar.title("Navigation")
 page = st.sidebar.radio("Go to", ["Home", "Dashboard"])
 
-def load_sample_images():
-    # Assuming you have a folder named 'sample_results' with your images
-    sample_dir = 'train10'
+def load_images_from_directory(directory):
     images = []
-    for filename in os.listdir(sample_dir):
-        if filename.endswith(('.png', '.jpg', '.jpeg')):
-            img_path = os.path.join(sample_dir, filename)
-            images.append(Image.open(img_path))
+    if os.path.exists(directory):
+        for filename in os.listdir(directory):
+            if filename.endswith(('.png', '.jpg', '.jpeg')):
+                img_path = os.path.join(directory, filename)
+                images.append((Image.open(img_path), filename))
     return images
+
+def display_images(images, columns=3):
+    cols = st.columns(columns)
+    for idx, (img, filename) in enumerate(images):
+        cols[idx % columns].image(img, use_column_width=True, caption=filename)
 
 # Main content
 if page == "Home":
-    st.title("Wind Turbine Blade Defect Detection")
-    st.write("Welcome to the Wind Turbine Blade Defect Detection application. "
-             "This app uses a YOLO-based deep learning model to detect defects "
-             "in wind turbine blades from drone inspection images.")
+    st.title("WindSightAI: Revolutionizing Wind Turbine Maintenance")
     
-    st.header("Sample Detection Results")
-    sample_images = load_sample_images()
+    st.markdown("""
+    Welcome to WindSightAI, the cutting-edge solution for wind turbine blade inspection. Our advanced AI-powered system transforms the way we detect and analyze defects, ensuring optimal performance and longevity of wind energy infrastructure.
+
+    ## Key Features:
+
+    - **AI-Driven Precision**: Harness the power of state-of-the-art YOLO-based deep learning models for accurate defect detection.
+    - **Drone Integration**: Seamlessly analyze high-resolution images captured by drones, enabling comprehensive inspections without the need for turbine downtime.
+    - **Real-Time Insights**: Get instant results and visualizations, allowing for quick decision-making and maintenance prioritization.
+    - **Enhanced Safety**: Reduce the need for dangerous manual inspections by leveraging our automated analysis tools.
+    - **Cost-Effective**: Minimize maintenance costs and maximize energy production through early defect detection and targeted repairs.
+
+    Explore the future of renewable energy maintenance with WindSightAI. Scroll down to see detection results and statistics!
+    """)
+
+    # Detection Results Section
+    st.header("Defect Detection Results")
+    detected_images = load_images_from_directory('detected_images')
     
-    if sample_images:
-        cols = st.columns(3)  # Adjust the number of columns as needed
-        for idx, img in enumerate(sample_images):
-            cols[idx % 3].image(img, use_column_width=True, caption=f"Sample Result {idx+1}")
+    if detected_images:
+        display_images(detected_images)
     else:
-        st.write("No sample images found. Please add some images to the 'sample_results' folder.")
+        st.write("No detected images found. Please add some images to the 'detected_images' folder.")
+
+    # Statistics and Plots Section
+    st.header("Statistics and Plots")
+    stat_images = load_images_from_directory('statistics_plots')
+    
+    if stat_images:
+        display_images(stat_images, columns=2)  # Using 2 columns for potentially larger plot images
+    else:
+        st.write("No statistics or plot images found. Please add some images to the 'statistics_plots' folder.")
 
 elif page == "Dashboard":
     st.title("Detection Dashboard")
