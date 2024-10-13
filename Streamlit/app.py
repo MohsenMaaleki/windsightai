@@ -56,6 +56,10 @@ if page == "Home":
         st.write(f"Current working directory: {os.getcwd()}")
         st.write(f"Contents of current directory: {os.listdir('.')}")
 
+elif page == "Dashboard":
+    st.title("Detection Dashboard")
+    create_dashboard()
+    
     # Statistics and Plots Section
     st.header("Statistics and Plots")
     stat_images = load_images_from_directory('statistics_plots')
@@ -66,8 +70,3 @@ if page == "Home":
         st.info("No statistics or plot images found. Please add some images to the 'statistics_plots' folder.")
         st.write(f"Current working directory: {os.getcwd()}")
         st.write(f"Contents of current directory: {os.listdir('.')}")
-
-elif page == "Dashboard":
-    st.title("Detection Dashboard")
-    create_dashboard()
-    
