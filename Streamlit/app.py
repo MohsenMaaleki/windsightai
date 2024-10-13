@@ -13,7 +13,7 @@ page = st.sidebar.radio("Go to", ["Home", "Dashboard"])
 
 def load_sample_images():
     # Assuming you have a folder named 'sample_results' with your images
-    sample_dir = '/teamspace/studios/this_studio/runs/detect/train10'
+    sample_dir = 'train10'
     images = []
     for filename in os.listdir(sample_dir):
         if filename.endswith(('.png', '.jpg', '.jpeg')):

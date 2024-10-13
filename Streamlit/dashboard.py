@@ -10,7 +10,7 @@ def create_dashboard():
     # Load data from CSV file
     @st.cache_data
     def load_data():
-        file_path = '/teamspace/studios/this_studio/runs/detect/train10/results.csv'  # Replace with your actual file path
+        file_path = 'train10/results.csv'  # Replace with your actual file path
         if not os.path.exists(file_path):
             st.error(f"File not found: {file_path}")
             return None
