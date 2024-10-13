@@ -18,6 +18,8 @@ def load_images_from_directory(directory):
             if filename.endswith(('.png', '.jpg', '.jpeg')):
                 img_path = os.path.join(directory, filename)
                 images.append((Image.open(img_path), filename))
+    else:
+        st.warning(f"Directory '{directory}' not found. Please check the path.")
     return images
 
 def display_images(images, columns=3):
@@ -50,7 +52,9 @@ if page == "Home":
     if detected_images:
         display_images(detected_images)
     else:
-        st.write("No detected images found. Please add some images to the 'detected_images' folder.")
+        st.info("No detected images found. Please add some images to the 'detected_images' folder.")
+        st.write(f"Current working directory: {os.getcwd()}")
+        st.write(f"Contents of current directory: {os.listdir('.')}")
 
     # Statistics and Plots Section
     st.header("Statistics and Plots")
@@ -59,8 +63,11 @@ if page == "Home":
     if stat_images:
         display_images(stat_images, columns=2)  # Using 2 columns for potentially larger plot images
     else:
-        st.write("No statistics or plot images found. Please add some images to the 'statistics_plots' folder.")
+        st.info("No statistics or plot images found. Please add some images to the 'statistics_plots' folder.")
+        st.write(f"Current working directory: {os.getcwd()}")
+        st.write(f"Contents of current directory: {os.listdir('.')}")
 
 elif page == "Dashboard":
     st.title("Detection Dashboard")
     create_dashboard()
+    
