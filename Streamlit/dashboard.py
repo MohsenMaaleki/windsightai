@@ -10,7 +10,7 @@ def create_dashboard():
     # Load data from CSV file
     @st.cache_data
     def load_data():
-        file_path = 'statistics_plots/results.csv ' 
+        file_path = 'statistics_plots/results.csv' 
         if not os.path.exists(file_path):
             st.error(f"File not found: {file_path}")
             return None
