@@ -11,6 +11,10 @@ st.set_page_config(page_title="WindSightAI: Turbine Blade Defect Detection", lay
 st.sidebar.title("Navigation")
 page = st.sidebar.radio("Go to", ["Home", "Dashboard"])
 
+# Add GitHub link to sidebar
+st.sidebar.markdown("---")
+st.sidebar.markdown("[GitHub Repository](https://github.com/MohsenMaaleki/windsightai)")
+
 def load_images_from_directory(directory):
     images = []
     if os.path.exists(directory):
@@ -70,3 +74,5 @@ elif page == "Dashboard":
         st.info("No statistics or plot images found. Please add some images to the 'statistics_plots' folder.")
         st.write(f"Current working directory: {os.getcwd()}")
         st.write(f"Contents of current directory: {os.listdir('.')}")
+
+        
