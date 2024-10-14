@@ -14,6 +14,7 @@ page = st.sidebar.radio("Go to", ["Home", "Dashboard"])
 # Add GitHub link to sidebar
 st.sidebar.markdown("---")
 st.sidebar.markdown("[GitHub Repository](https://github.com/MohsenMaaleki/windsightai)")
+st.sidebar.markdown("---")
 
 def load_images_from_directory(directory):
     images = []
