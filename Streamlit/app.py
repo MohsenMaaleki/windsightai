@@ -69,18 +69,27 @@ if page == "Home":
             tmp_file_path = tmp_file.name
 
         # Load the YOLO model
-        model = YOLO("weights/best.pt")  # load your custom model
+        model_path = "weights/best.pt"
+        if not os.path.exists(model_path):
+            st.error(f"Model file not found: {model_path}")
+            st.info("Please ensure the model file is in the correct location.")
+        else:
+            try:
+                model = YOLO(model_path)  # load your custom model
 
-        # Perform prediction
-        if st.button("Analyze Image"):
-            with st.spinner("Analyzing image..."):
-                results = model(tmp_file_path, save=True)
-                
-                # Display the result
-                for r in results:
-                    im_array = r.plot()  # plot a BGR numpy array of predictions
-                    im = Image.fromarray(im_array[..., ::-1])  # RGB PIL image
-                    st.image(im, caption="Analyzed Image", use_column_width=True)
+                # Perform prediction
+                if st.button("Analyze Image"):
+                    with st.spinner("Analyzing image..."):
+                        results = model(tmp_file_path, save=True)
+                        
+                        # Display the result
+                        for r in results:
+                            im_array = r.plot()  # plot a BGR numpy array of predictions
+                            im = Image.fromarray(im_array[..., ::-1])  # RGB PIL image
+                            st.image(im, caption="Analyzed Image", use_column_width=True)
+            except Exception as e:
+                st.error(f"An error occurred while loading or using the model: {str(e)}")
+                st.info("Please check if the model file is correct and not corrupted.")
 
         # Clean up the temporary file
         os.unlink(tmp_file_path)
