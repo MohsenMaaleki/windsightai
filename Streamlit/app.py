@@ -3,6 +3,8 @@ import streamlit as st
 from dashboard import create_dashboard
 from PIL import Image
 import os
+from ultralytics import YOLO
+import tempfile
 
 # Set page config
 st.set_page_config(page_title="WindSightAI: Turbine Blade Defect Detection", layout="wide")
@@ -50,8 +52,39 @@ if page == "Home":
     Explore the future of renewable energy maintenance with WindSightAI. Scroll down to see detection results and statistics!
     """)
 
+    # Add image upload feature
+    st.header("Upload and Analyze Your Own Image")
+    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+    
+    if uploaded_file is not None:
+        # Display the uploaded image
+        image = Image.open(uploaded_file)
+        st.image(image, caption="Uploaded Image", use_column_width=True)
+        
+        # Save the uploaded file temporarily
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp_file:
+            tmp_file.write(uploaded_file.getvalue())
+            tmp_file_path = tmp_file.name
+
+        # Load the YOLO model
+        model = YOLO("weights/best.pt")  # load your custom model
+
+        # Perform prediction
+        if st.button("Analyze Image"):
+            with st.spinner("Analyzing image..."):
+                results = model(tmp_file_path, save=True)
+                
+                # Display the result
+                for r in results:
+                    im_array = r.plot()  # plot a BGR numpy array of predictions
+                    im = Image.fromarray(im_array[..., ::-1])  # RGB PIL image
+                    st.image(im, caption="Analyzed Image", use_column_width=True)
+
+        # Clean up the temporary file
+        os.unlink(tmp_file_path)
+
     # Detection Results Section
-    st.header("Defect Detection Results")
+    st.header("Sample Defect Detection Results")
     detected_images = load_images_from_directory('detected_images')
     
     if detected_images:
