@@ -13,6 +13,8 @@ st.set_page_config(page_title="WindSightAI: Turbine Blade Defect Detection", lay
 st.sidebar.title("Navigation")
 page = st.sidebar.radio("Go to", ["Home", "Dashboard"])
 
+
+# test
 # Add GitHub link to sidebar
 st.sidebar.markdown("---")
 st.sidebar.markdown("[GitHub Repository](https://github.com/MohsenMaaleki/windsightai)")
