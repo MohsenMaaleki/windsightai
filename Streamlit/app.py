@@ -20,15 +20,18 @@ st.sidebar.markdown("---")
 st.sidebar.markdown("[GitHub Repository](https://github.com/MohsenMaaleki/windsightai)")
 st.sidebar.markdown("---")
 
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
 def load_images_from_directory(directory):
     images = []
-    if os.path.exists(directory):
-        for filename in os.listdir(directory):
+    full_path = os.path.join(script_dir, directory)
+    if os.path.exists(full_path):
+        for filename in os.listdir(full_path):
             if filename.endswith(('.png', '.jpg', '.jpeg')):
-                img_path = os.path.join(directory, filename)
+                img_path = os.path.join(full_path, filename)
                 images.append((Image.open(img_path), filename))
     else:
-        st.warning(f"Directory '{directory}' not found. Please check the path.")
+        st.warning(f"Directory '{full_path}' not found. Please check the path.")
     return images
 
 def display_images(images, columns=3):
@@ -69,7 +72,7 @@ if page == "Home":
             tmp_file_path = tmp_file.name
 
         # Load the YOLO model
-        model = YOLO("./weights/best.pt")  # load your custom model
+        model = YOLO(os.path.join(script_dir, "weights", "best.pt"))  # load your custom model
 
         # Perform prediction
         if st.button("Analyze Image"):
