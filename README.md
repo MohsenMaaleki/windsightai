@@ -28,6 +28,12 @@ We are continuously working to enhance WindSightAI's capabilities. Our upcoming 
 
 Stay tuned for these exciting enhancements that will further revolutionize wind turbine maintenance!
 
+![14682_cyberhawk_wind](https://github.com/user-attachments/assets/4a9d01c8-fec3-4d89-9384-80aede03adcf)
+
+![DJI_0032_03_04](https://github.com/user-attachments/assets/2ca01596-ce5b-4e13-9ba8-7b09cb9c3af7)
+
+![DJI_0099_05_04](https://github.com/user-attachments/assets/77ab120e-15c2-4fe8-86ea-ef80117d6e0d)
+
 ## License
 
 Distributed under the AGPL-3.0 License. See `LICENSE` for more information.
