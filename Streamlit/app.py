@@ -77,13 +77,22 @@ if page == "Home":
         # Perform prediction
         if st.button("Analyze Image"):
             with st.spinner("Analyzing image..."):
-                results = model(tmp_file_path, save=True)
+                results = model(tmp_file_path)  # Remove save=True
                 
                 # Display the result
                 for r in results:
+                    boxes = r.boxes  # Bounding box objects
                     im_array = r.plot()  # plot a BGR numpy array of predictions
                     im = Image.fromarray(im_array[..., ::-1])  # RGB PIL image
-                    st.image(im, caption="Analyzed Image", use_column_width=True)
+                    st.image(im, caption="Analyzed Image with Detections", use_column_width=True)
+                
+                # Display detection information
+                st.subheader("Detection Results:")
+                for box in boxes:
+                    conf = box.conf.item()
+                    cls = int(box.cls.item())
+                    class_name = model.names[cls]
+                    st.write(f"Detected: {class_name}, Confidence: {conf:.2f}")
 
         # Clean up the temporary file
         os.unlink(tmp_file_path)
