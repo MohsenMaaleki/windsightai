@@ -10,11 +10,12 @@ from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": os.environ.get('CORS_ALLOWED_ORIGINS')}}, supports_credentials=True)
+CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
+
 UPLOAD_FOLDER = 'uploads'
 OUTPUT_FOLDER = 'output'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'avi'}
-MODEL_PATH = './best.pt'
+MODEL_PATH = os.path.join(os.path.dirname(__file__), 'best.pt')
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
@@ -34,24 +35,31 @@ def predict_and_save(file_path: str, model_path: str = MODEL_PATH, output_dir: s
     output_dir.mkdir(parents=True, exist_ok=True)
     
     try:
+        app.logger.info(f"Loading model from {model_path}")
         model = YOLO(model_path)
     except Exception as e:
+        app.logger.error(f"Failed to load model from {model_path}: {e}")
         raise RuntimeError(f"Failed to load model from {model_path}: {e}")
     
     try:
+        app.logger.info(f"Running prediction on {file_path}")
         results = model(file_path)
     except Exception as e:
+        app.logger.error(f"Prediction failed for file {file_path}: {e}")
         raise RuntimeError(f"Prediction failed for file {file_path}: {e}")
     
     input_path = Path(file_path)
     output_path = output_dir / f"{input_path.stem}_pred{input_path.suffix}"
     
     try:
+        app.logger.info(f"Saving prediction result to {output_path}")
         results[0].save(output_path)
     except Exception as e:
+        app.logger.error(f"Failed to save prediction result to {output_path}: {e}")
         raise RuntimeError(f"Failed to save prediction result to {output_path}: {e}")
     
     return str(output_path)
+
 
 @app.route('/api/register', methods=['POST'])
 def register():
