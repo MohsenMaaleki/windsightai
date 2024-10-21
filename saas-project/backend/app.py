@@ -145,13 +145,21 @@ def analyze_file(upload_id):
     try:
         upload = db.query(Upload).get(upload_id)
         if not upload:
+            app.logger.error(f"Upload not found for ID: {upload_id}")
             return jsonify({"error": "Upload not found"}), 404
         
         file_path = upload.original_path
         if not os.path.exists(file_path):
+            app.logger.error(f"File not found at path: {file_path}")
             return jsonify({"error": "File not found"}), 404
         
-        output_path = predict_and_save(file_path)
+        try:
+            output_path = predict_and_save(file_path)
+            app.logger.info(f"Analysis completed for file: {file_path}")
+        except Exception as e:
+            app.logger.error(f"Error during prediction: {str(e)}")
+            return jsonify({"error": f"Analysis failed: {str(e)}"}), 500
+        
         relative_output_path = os.path.relpath(output_path, start=app.config['OUTPUT_FOLDER'])
         
         new_analysis = Analysis(
@@ -170,6 +178,7 @@ def analyze_file(upload_id):
         }), 200
     except Exception as e:
         db.rollback()
+        app.logger.error(f"Unexpected error in analyze_file: {str(e)}")
         return jsonify({"error": str(e)}), 500
     finally:
         db.close()
