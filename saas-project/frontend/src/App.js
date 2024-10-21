@@ -5,9 +5,9 @@ import { UserProvider } from './UserContext';
 import Header from './components/Header';
 import LandingPage from './components/LandingPage';
 import Login from './components/Login';
-import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import ContactUs from './components/ContactUs';
+import RequestDemo from './components/RequestDemo';
 
 function App() {
   return (
@@ -18,9 +18,9 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/contact" element={<ContactUs />} />
+            <Route path="/request-demo" element={<RequestDemo />} />
           </Routes>
         </Router>
       </UserProvider>
