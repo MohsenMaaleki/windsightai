@@ -30,8 +30,11 @@ services:
       - POSTGRES_DB=windsightai_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"  
     networks:
       - app-network
+
 
 volumes:
   postgres_data:
