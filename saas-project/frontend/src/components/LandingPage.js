@@ -7,20 +7,15 @@ import {
   Button,
   VStack,
   Container,
-  useColorModeValue,
-  List,
-  ListItem,
-  ListIcon,
   Grid,
   GridItem,
   Image,
   AspectRatio,
   Flex,
   Icon,
-  Divider,
 } from '@chakra-ui/react';
-import { FaCheck, FaWind, FaPlane, FaChartLine, FaShieldAlt, FaPiggyBank, FaLeaf } from 'react-icons/fa';
-import WindImage from './Wind.jpg'; // Import the Wind.jpg image
+import { FaWind, FaPlane, FaChartLine, FaShieldAlt, FaPiggyBank, FaLeaf } from 'react-icons/fa';
+import WindImage from './Wind.jpg';
 
 const FeatureCard = ({ icon, title, description }) => (
   <VStack
@@ -91,7 +86,7 @@ const LandingPage = () => {
             </Box>
           </Flex>
 
-          {/* Media Section (previously "See WindSightAI in Action") */}
+          {/* Media Section */}
           <Box>
             <Heading as="h2" size="xl" mb={8} textAlign="center" color="white">
               See WindSightAI in Action
@@ -99,9 +94,16 @@ const LandingPage = () => {
             <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={8}>
               <GridItem>
                 <AspectRatio ratio={16 / 9}>
-                  <Box bg="rgba(255, 255, 255, 0.1)" rounded="lg" backdropFilter="blur(10px)">
-                    <Text textAlign="center" pt="20%" color="white">Video Placeholder</Text>
-                  </Box>
+                  <video
+                    controls
+                    src="/videos/demo.mp4"
+                    style={{
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                    }}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
                 </AspectRatio>
               </GridItem>
               <GridItem>
