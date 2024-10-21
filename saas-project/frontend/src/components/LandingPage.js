@@ -8,11 +8,11 @@ import {
   VStack,
   Container,
   Grid,
-  GridItem,
   Image,
   AspectRatio,
   Flex,
   Icon,
+  Link,
 } from '@chakra-ui/react';
 import { FaWind, FaPlane, FaChartLine, FaShieldAlt, FaPiggyBank, FaLeaf } from 'react-icons/fa';
 import WindImage from './Wind.jpg';
@@ -40,8 +40,10 @@ const LandingPage = () => {
       bgGradient="linear(to-br, teal.400, blue.500, purple.600)"
       minH="100vh"
       color="white"
+      display="flex"
+      flexDirection="column"
     >
-      <Container maxW="container.xl" py={20}>
+      <Container maxW="container.xl" py={20} flex="1">
         <VStack spacing={16} alignItems="stretch">
           {/* Hero Section */}
           <Flex direction={{ base: 'column', md: 'row' }} align="center" justify="space-between">
@@ -177,6 +179,23 @@ const LandingPage = () => {
           </Box>
         </VStack>
       </Container>
+
+      {/* Footer with Dataset Reference */}
+      <Box bg="rgba(0, 0, 0, 0.2)" py={4}>
+        <Container maxW="container.xl">
+          <Text fontSize="sm" textAlign="center">
+            Model trained on dataset: SHIHAVUDDIN, ASM; Chen, Xiao (2018), "DTU - Drone inspection images of wind turbine", Mendeley Data, V2, doi: 
+            <Link 
+              href="https://doi.org/10.17632/hd96prn3nc.2" 
+              isExternal 
+              color="teal.200"
+              ml={1}
+            >
+              10.17632/hd96prn3nc.2
+            </Link>
+          </Text>
+        </Container>
+      </Box>
     </Box>
   );
 };
