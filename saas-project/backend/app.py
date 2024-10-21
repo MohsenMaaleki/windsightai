@@ -10,8 +10,7 @@ from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "http://localhost"}}, supports_credentials=True)
-
+CORS(app, resources={r"/api/*": {"origins": os.environ.get('CORS_ALLOWED_ORIGINS')}}, supports_credentials=True)
 UPLOAD_FOLDER = 'uploads'
 OUTPUT_FOLDER = 'output'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'avi'}
