@@ -91,8 +91,8 @@ const LandingPage = () => {
             <Heading as="h2" size="xl" mb={8} textAlign="center" color="white">
               See WindSightAI in Action
             </Heading>
-            <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={8}>
-              <GridItem>
+            <Flex justify="center">
+              <Box width={{ base: "100%", md: "75%", lg: "60%" }}>
                 <AspectRatio ratio={16 / 9}>
                   <video
                     controls
@@ -105,11 +105,8 @@ const LandingPage = () => {
                     Your browser does not support the video tag.
                   </video>
                 </AspectRatio>
-              </GridItem>
-              <GridItem>
-                <Image src="/api/placeholder/600/400" alt="WindSightAI Demo" rounded="lg" />
-              </GridItem>
-            </Grid>
+              </Box>
+            </Flex>
           </Box>
 
           {/* Features Section */}
