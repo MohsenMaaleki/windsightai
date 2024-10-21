@@ -10,7 +10,7 @@ from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
 UPLOAD_FOLDER = 'uploads'
 OUTPUT_FOLDER = 'output'
@@ -89,7 +89,11 @@ def login():
                 "username": user.username
             }), 200
         else:
+            app.logger.error(f"Login failed for username: {data['username']}")
             return jsonify({"error": "Invalid credentials"}), 401
+    except Exception as e:
+        app.logger.error(f"Login error: {str(e)}")
+        return jsonify({"error": "An unexpected error occurred"}), 500
     finally:
         db.close()
 
@@ -279,4 +283,3 @@ def output_file(filename):
 
 if __name__ == '__main__':
     app.run(debug=True)
-
