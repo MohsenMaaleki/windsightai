@@ -7,8 +7,8 @@ import LandingPage from './components/LandingPage';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import ContactUs from './components/ContactUs';
-import RequestDemo from './components/RequestDemo';
 import Register from './components/Register';
+
 function App() {
   return (
     <ChakraProvider>
@@ -20,8 +20,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/contact" element={<ContactUs />} />
-            <Route path="/request-demo" element={<RequestDemo />} />
-	    <Route path="/register" element={<Register />} />
+            <Route path="/register" element={<Register />} />
           </Routes>
         </Router>
       </UserProvider>

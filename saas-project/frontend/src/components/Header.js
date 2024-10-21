@@ -43,8 +43,8 @@ const Header = () => {
               <Button as={RouterLink} to="/login" variant="ghost" color="white" mr={2}>
                 Login
               </Button>
-              <Button as={RouterLink} to="/request-demo" variant="solid" colorScheme="green">
-                Request Demo
+              <Button as={RouterLink} to="/register" variant="solid" colorScheme="green">
+                Register
               </Button>
             </>
           )}
