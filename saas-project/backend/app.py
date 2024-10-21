@@ -14,7 +14,7 @@ CORS(app, resources={r"/api/*": {"origins": os.environ.get('CORS_ALLOWED_ORIGINS
 UPLOAD_FOLDER = 'uploads'
 OUTPUT_FOLDER = 'output'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'avi'}
-MODEL_PATH = 'best.pt'
+MODEL_PATH = './best.pt'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
