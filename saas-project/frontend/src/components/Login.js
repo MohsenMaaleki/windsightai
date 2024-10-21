@@ -14,7 +14,15 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/login', { username, password });
+      const response = await axios.post('http://backend:5000/api/login', 
+        { username, password },
+        { 
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
       const userData = { username, id: response.data.user_id };
       login(userData);
       localStorage.setItem('userId', response.data.user_id);

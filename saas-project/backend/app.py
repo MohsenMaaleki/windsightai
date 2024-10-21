@@ -10,7 +10,7 @@ from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/api/*": {"origins": "http://localhost"}}, supports_credentials=True)
 
 UPLOAD_FOLDER = 'uploads'
 OUTPUT_FOLDER = 'output'
@@ -76,6 +76,7 @@ def register():
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.json
+    app.logger.info(f"Login attempt for username: {data.get('username')}")
     db = next(get_db())
     try:
         user = db.query(User).filter(User.username == data['username']).first()
@@ -83,13 +84,14 @@ def login():
             user.last_login = datetime.utcnow()
             db.add(user)
             db.commit()
+            app.logger.info(f"Login successful for user: {user.username}")
             return jsonify({
                 "message": "Login successful",
                 "user_id": user.id,
                 "username": user.username
             }), 200
         else:
-            app.logger.error(f"Login failed for username: {data['username']}")
+            app.logger.warning(f"Login failed for username: {data['username']}")
             return jsonify({"error": "Invalid credentials"}), 401
     except Exception as e:
         app.logger.error(f"Login error: {str(e)}")
@@ -280,6 +282,25 @@ def uploaded_file(filename):
 @app.route('/output/<filename>')
 def output_file(filename):
     return send_from_directory(app.config['OUTPUT_FOLDER'], filename)
+
+def init_db():
+    db = next(get_db())
+    try:
+        # Check if any users exist
+        user_count = db.query(User).count()
+        if user_count == 0:
+            # Create a test user
+            test_user = User(username='test', email='test@example.com', password_hash='test')
+            db.add(test_user)
+            db.commit()
+            print("Test user created")
+    except Exception as e:
+        print(f"Error initializing database: {str(e)}")
+    finally:
+        db.close()
+
+# Call this function when your app starts
+init_db()
 
 if __name__ == '__main__':
     app.run(debug=True)
