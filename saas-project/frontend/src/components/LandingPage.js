@@ -6,215 +6,177 @@ import {
   Text,
   Button,
   VStack,
-  HStack,
   Container,
-  Image,
-  Icon,
-  Flex,
-  SimpleGrid,
   useColorModeValue,
-  Highlight,
+  List,
+  ListItem,
+  ListIcon,
+  Grid,
+  GridItem,
+  Image,
+  AspectRatio,
+  Flex,
+  Icon,
   Divider,
-  Avatar,
-  Wrap,
-  WrapItem,
 } from '@chakra-ui/react';
-import { FaRocket, FaChartLine, FaLock, FaCheck } from 'react-icons/fa';
+import { FaCheck, FaWind, FaPlane, FaChartLine, FaShieldAlt, FaPiggyBank, FaLeaf } from 'react-icons/fa';
+import WindImage from './Wind.jpg'; // Import the Wind.jpg image
 
-const Feature = ({ icon, title, description }) => (
+const FeatureCard = ({ icon, title, description }) => (
   <VStack
-    bg={useColorModeValue('white', 'gray.800')}
-    p={6}
-    rounded="xl"
-    shadow="xl"
-    borderWidth="1px"
-    borderColor={useColorModeValue('gray.200', 'gray.700')}
     align="start"
-    spacing={4}
-    height="full"
-    transition="all 0.3s"
-    _hover={{ transform: 'translateY(-5px)', shadow: '2xl' }}
-  >
-    <Flex
-      alignItems="center"
-      justifyContent="center"
-      w={16}
-      h={16}
-      rounded="full"
-      bg={useColorModeValue('blue.100', 'blue.900')}
-    >
-      <Icon as={icon} w={8} h={8} color={useColorModeValue('blue.500', 'blue.200')} />
-    </Flex>
-    <Heading as="h3" size="md">
-      {title}
-    </Heading>
-    <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')}>
-      {description}
-    </Text>
-  </VStack>
-);
-
-const Testimonial = ({ name, role, content, avatar }) => (
-  <VStack
-    spacing={4}
-    p={6}
-    bg={useColorModeValue('white', 'gray.800')}
-    rounded="xl"
+    p={5}
+    bg="rgba(255, 255, 255, 0.1)"
+    backdropFilter="blur(10px)"
+    rounded="lg"
     shadow="md"
-    borderWidth="1px"
-    borderColor={useColorModeValue('gray.200', 'gray.700')}
+    height="100%"
+    color="white"
   >
-    <Text fontSize="md" fontStyle="italic">
-      "{content}"
-    </Text>
-    <HStack spacing={4}>
-      <Avatar size="md" name={name} src={avatar} />
-      <Box textAlign="left">
-        <Text fontWeight="bold">{name}</Text>
-        <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')}>
-          {role}
-        </Text>
-      </Box>
-    </HStack>
+    <Icon as={icon} w={10} h={10} color="teal.200" />
+    <Heading size="md">{title}</Heading>
+    <Text>{description}</Text>
   </VStack>
 );
 
 const LandingPage = () => {
-  const bgColor = useColorModeValue('gray.50', 'gray.900');
-  const textColor = useColorModeValue('gray.600', 'gray.300');
-  const highlightColor = useColorModeValue('blue.500', 'blue.300');
-
   return (
-    <Box bg={bgColor} minH="100vh">
+    <Box
+      bgGradient="linear(to-br, teal.400, blue.500, purple.600)"
+      minH="100vh"
+      color="white"
+    >
       <Container maxW="container.xl" py={20}>
-        <Flex direction={{ base: 'column', lg: 'row' }} alignItems="center" mb={20}>
-          <VStack spacing={8} alignItems={{ base: 'center', lg: 'flex-start' }} textAlign={{ base: 'center', lg: 'left' }} flex={1}>
-            <Heading as="h1" size="3xl" lineHeight="shorter">
-              <Highlight query="Transform" styles={{ px: '2', py: '1', rounded: 'full', bg: 'blue.100', color: 'blue.700' }}>
-                Transform Your Business
-              </Highlight>{' '}
-              with YourSaaS
-            </Heading>
-            <Text fontSize="xl" maxW="2xl" color={textColor}>
-              Empower your team, streamline workflows, and skyrocket productivity with our cutting-edge SaaS solution. Experience the future of business operations today.
-            </Text>
-            <HStack spacing={4}>
-              <Button as={RouterLink} to="/register" colorScheme="blue" size="lg" px={8} fontWeight="bold">
-                Start Free Trial
+        <VStack spacing={16} alignItems="stretch">
+          {/* Hero Section */}
+          <Flex direction={{ base: 'column', md: 'row' }} align="center" justify="space-between">
+            <Box flex={1} pr={{ base: 0, md: 8 }}>
+              <Heading as="h1" size="3xl" lineHeight="shorter" mb={6}>
+                <Text
+                  as="span"
+                  color="blue.900"
+                  fontWeight="extrabold"
+                  textShadow="2px 2px 4px rgba(255,255,255,0.4)"
+                >
+                  WindSightAI
+                </Text>
+                : Revolutionizing Wind Turbine Maintenance
+              </Heading>
+              <Text fontSize="xl" mb={8}>
+                Welcome to WindSightAI, the cutting-edge solution for wind turbine blade inspection. Our advanced AI-powered system transforms the way we detect and analyze defects, ensuring optimal performance and longevity of wind energy infrastructure.
+              </Text>
+              <Button 
+                as={RouterLink} 
+                to="/login" 
+                colorScheme="blue" 
+                bg="blue.900" 
+                color="white" 
+                size="lg" 
+                fontWeight="bold" 
+                _hover={{ bg: "blue.800" }}
+              >
+                Get Started
               </Button>
-              <Button as={RouterLink} to="/demo" colorScheme="blue" variant="outline" size="lg" fontWeight="bold">
-                Watch Demo
-              </Button>
-            </HStack>
-          </VStack>
-          <Box flex={1} ml={{ base: 0, lg: 12 }} mt={{ base: 12, lg: 0 }}>
-            <Image src="/path/to/hero-image.png" alt="YourSaaS Dashboard" rounded="lg" shadow="2xl" />
-          </Box>
-        </Flex>
+            </Box>
+            <Box flex={1} mt={{ base: 8, md: 0 }}>
+              <Image 
+                src={WindImage} 
+                alt="Wind Turbine" 
+                rounded="lg" 
+                shadow="2xl" 
+                objectFit="cover"
+                w="100%"
+                h={{ base: "300px", md: "400px" }}
+              />
+            </Box>
+          </Flex>
 
-        <VStack spacing={16}>
-          <Heading as="h2" size="xl" textAlign="center">
-            Why Choose{' '}
-            <Text as="span" color={highlightColor}>
-              YourSaaS
-            </Text>
-            ?
-          </Heading>
-          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={10} w="full">
-            <Feature
-              icon={FaRocket}
-              title="Boost Productivity"
-              description="Automate repetitive tasks and focus on what matters most to your business. Increase efficiency across your entire organization."
-            />
-            <Feature
-              icon={FaChartLine}
-              title="Data-Driven Insights"
-              description="Make informed decisions with powerful analytics and customizable dashboards. Turn your data into actionable strategies."
-            />
-            <Feature
-              icon={FaLock}
-              title="Enterprise-Grade Security"
-              description="Rest easy knowing your data is protected by state-of-the-art security measures. We prioritize your privacy and data integrity."
-            />
-          </SimpleGrid>
-        </VStack>
-
-        <Box my={20}>
-          <Heading as="h2" size="xl" textAlign="center" mb={10}>
-            Trusted by Industry Leaders
-          </Heading>
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8}>
-            <Testimonial
-              name="Sarah Johnson"
-              role="CEO, TechInnovate"
-              content="YourSaaS has revolutionized how we manage our projects. The productivity boost is remarkable!"
-              avatar="/path/to/avatar1.jpg"
-            />
-            <Testimonial
-              name="Michael Chen"
-              role="CTO, DataDriven Co."
-              content="The insights we've gained through YourSaaS analytics have been game-changing for our decision-making process."
-              avatar="/path/to/avatar2.jpg"
-            />
-            <Testimonial
-              name="Emily Rodriguez"
-              role="Operations Manager, GlobalTech"
-              content="The level of security and ease of use that YourSaaS provides gives us peace of mind and helps us focus on growth."
-              avatar="/path/to/avatar3.jpg"
-            />
-          </SimpleGrid>
-        </Box>
-
-        <Divider my={20} />
-
-        <Box textAlign="center">
-          <Heading as="h2" size="xl" mb={4}>
-            Ready to{' '}
-            <Text as="span" color={highlightColor}>
-              Transform
-            </Text>{' '}
-            Your Business?
-          </Heading>
-          <Text fontSize="lg" mb={8} maxW="2xl" mx="auto">
-            Join thousands of satisfied customers and take your business to the next level. Start your journey to unprecedented growth and efficiency today.
-          </Text>
-          <VStack spacing={4}>
-            <Button as={RouterLink} to="/register" colorScheme="blue" size="lg" px={12} fontWeight="bold">
-              Start Your Free Trial
-            </Button>
-            <Text fontSize="sm" color={textColor}>
-              No credit card required. 14-day free trial.
-            </Text>
-          </VStack>
-        </Box>
-
-        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10} mt={20}>
+          {/* Media Section (previously "See WindSightAI in Action") */}
           <Box>
-            <Heading as="h3" size="lg" mb={4}>
+            <Heading as="h2" size="xl" mb={8} textAlign="center" color="white">
+              See WindSightAI in Action
+            </Heading>
+            <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={8}>
+              <GridItem>
+                <AspectRatio ratio={16 / 9}>
+                  <Box bg="rgba(255, 255, 255, 0.1)" rounded="lg" backdropFilter="blur(10px)">
+                    <Text textAlign="center" pt="20%" color="white">Video Placeholder</Text>
+                  </Box>
+                </AspectRatio>
+              </GridItem>
+              <GridItem>
+                <Image src="/api/placeholder/600/400" alt="WindSightAI Demo" rounded="lg" />
+              </GridItem>
+            </Grid>
+          </Box>
+
+          {/* Features Section */}
+          <Box>
+            <Heading as="h2" size="xl" mb={8} textAlign="center" color="white">
               Key Features
             </Heading>
-            <VStack align="start" spacing={3}>
-              {['Advanced Analytics', 'Team Collaboration', 'Custom Workflows', 'Integration Ecosystem', 'Mobile Access'].map((feature) => (
-                <HStack key={feature}>
-                  <Icon as={FaCheck} color={highlightColor} />
-                  <Text>{feature}</Text>
-                </HStack>
-              ))}
-            </VStack>
+            <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={8}>
+              <FeatureCard
+                icon={FaWind}
+                title="AI-Driven Precision"
+                description="Harness the power of state-of-the-art YOLO-based deep learning models for accurate defect detection."
+              />
+              <FeatureCard
+                icon={FaPlane}
+                title="Drone Integration"
+                description="Seamlessly analyze high-resolution images captured by drones, enabling comprehensive inspections without turbine downtime."
+              />
+              <FeatureCard
+                icon={FaChartLine}
+                title="Real-Time Insights"
+                description="Get instant results and visualizations, allowing for quick decision-making and maintenance prioritization."
+              />
+              <FeatureCard
+                icon={FaShieldAlt}
+                title="Enhanced Safety"
+                description="Reduce the need for dangerous manual inspections by leveraging our automated analysis tools."
+              />
+              <FeatureCard
+                icon={FaPiggyBank}
+                title="Cost-Effective"
+                description="Minimize maintenance costs and maximize energy production through early defect detection and targeted repairs."
+              />
+              <FeatureCard
+                icon={FaLeaf}
+                title="Environmental Impact"
+                description="Optimize wind turbine efficiency, reducing carbon footprint and contributing to a greener, more sustainable energy future."
+              />
+            </Grid>
           </Box>
+
+          {/* Pricing Section */}
           <Box>
-            <Heading as="h3" size="lg" mb={4}>
-              Get Started in Minutes
+            <Heading as="h2" size="xl" mb={8} textAlign="center" color="white">
+              Pricing
             </Heading>
-            <VStack align="start" spacing={3}>
-              <Text>1. Sign up for your free trial</Text>
-              <Text>2. Set up your account and team</Text>
-              <Text>3. Import your data or start fresh</Text>
-              <Text>4. Customize your workflows</Text>
-              <Text>5. Watch your productivity soar!</Text>
-            </VStack>
+            <Box
+              borderWidth="1px"
+              borderRadius="lg"
+              p={8}
+              textAlign="center"
+              bg="rgba(255, 255, 255, 0.1)"
+              backdropFilter="blur(10px)"
+              shadow="xl"
+              maxW="md"
+              mx="auto"
+              color="white"
+            >
+              <Heading as="h3" size="lg" mb={4}>
+                Coming Soon
+              </Heading>
+              <Text fontSize="lg">We're working on exciting pricing options for WindSightAI.</Text>
+              <Text mt={2} fontSize="lg">Stay tuned for more information!</Text>
+              <Button as={RouterLink} to="/contact" colorScheme="teal" size="lg" mt={8}>
+                Contact Us for Details
+              </Button>
+            </Box>
           </Box>
-        </SimpleGrid>
+        </VStack>
       </Container>
     </Box>
   );

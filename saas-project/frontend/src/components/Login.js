@@ -1,21 +1,34 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Box, VStack, Heading, Input, Button } from '@chakra-ui/react';
+import { Box, VStack, Heading, Input, Button, useToast } from '@chakra-ui/react';
+import { useUser } from '../UserContext';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const toast = useToast();
+  const { login } = useUser();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:5000/api/login', { username, password });
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      const userData = { username, id: response.data.user_id };
+      login(userData);
+      localStorage.setItem('userId', response.data.user_id);
+      localStorage.setItem('user', JSON.stringify(userData));
       navigate('/dashboard');
     } catch (error) {
       console.error('Login failed:', error);
+      toast({
+        title: 'Login failed',
+        description: error.response?.data?.error || 'An unexpected error occurred',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 

@@ -10,7 +10,7 @@ from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
 UPLOAD_FOLDER = 'uploads'
 OUTPUT_FOLDER = 'output'
@@ -77,84 +77,75 @@ def register():
 def login():
     data = request.json
     db = next(get_db())
-    user = db.query(User).filter(User.username == data['username']).first()
-    if user and user.password_hash == data['password']:  # In a real app, verify the hashed password
-        user.last_login = datetime.utcnow()
-        db.add(user)
-        db.commit()
+    try:
+        user = db.query(User).filter(User.username == data['username']).first()
+        if user and user.password_hash == data['password']:  # In a real app, verify the hashed password
+            user.last_login = datetime.utcnow()
+            db.add(user)
+            db.commit()
+            return jsonify({
+                "message": "Login successful",
+                "user_id": user.id,
+                "username": user.username
+            }), 200
+        else:
+            return jsonify({"error": "Invalid credentials"}), 401
+    finally:
         db.close()
-        return jsonify({"message": "Login successful", "user_id": user.id})
-    db.close()
-    return jsonify({"message": "Invalid credentials"}), 401
 
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
     user_id = request.form.get('user_id')
-    db = next(get_db())
-    
-    # Check for active subscription
-    subscription = db.query(Subscription).filter(
-        Subscription.user_id == user_id,
-        Subscription.status == 'active',
-        Subscription.end_date > datetime.utcnow()
-    ).first()
-    
-    if not subscription:
-        db.close()
-        return jsonify({"error": "Active subscription required to upload files"}), 403
+    if not user_id:
+        return jsonify({"error": "User ID is required"}), 400
 
     if 'file' not in request.files:
-        db.close()
         return jsonify({"error": "No file part"}), 400
     file = request.files['file']
     if file.filename == '':
-        db.close()
         return jsonify({"error": "No selected file"}), 400
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
         
-        new_upload = Upload(
-            user_id=user_id,
-            filename=filename,
-            original_path=file_path,
-            file_type=file.content_type,
-            file_size=os.path.getsize(file_path)
-        )
-        db.add(new_upload)
-        db.commit()
-        db.close()
-        
-        return jsonify({"message": "File uploaded successfully", "filename": filename}), 201
-    db.close()
+        db = next(get_db())
+        try:
+            new_upload = Upload(
+                user_id=user_id,
+                filename=filename,
+                original_path=file_path,
+                file_type=file.content_type,
+                file_size=os.path.getsize(file_path)
+            )
+            db.add(new_upload)
+            db.commit()
+            db.refresh(new_upload)
+            
+            return jsonify({
+                "message": "File uploaded successfully", 
+                "filename": filename, 
+                "upload_id": new_upload.id
+            }), 201
+        except Exception as e:
+            db.rollback()
+            return jsonify({"error": str(e)}), 500
+        finally:
+            db.close()
     return jsonify({"error": "File type not allowed"}), 400
 
 @app.route('/api/analyze/<int:upload_id>', methods=['POST'])
 def analyze_file(upload_id):
     db = next(get_db())
-    upload = db.query(Upload).get(upload_id)
-    if not upload:
-        db.close()
-        return jsonify({"error": "Upload not found"}), 404
-    
-    # Check for active subscription
-    subscription = db.query(Subscription).filter(
-        Subscription.user_id == upload.user_id,
-        Subscription.status == 'active',
-        Subscription.end_date > datetime.utcnow()
-    ).first()
-    
-    if not subscription:
-        db.close()
-        return jsonify({"error": "Active subscription required to analyze files"}), 403
-    
-    file_path = upload.original_path
-    if not os.path.exists(file_path):
-        db.close()
-        return jsonify({"error": "File not found"}), 404
-    
     try:
+        upload = db.query(Upload).get(upload_id)
+        if not upload:
+            return jsonify({"error": "Upload not found"}), 404
+        
+        file_path = upload.original_path
+        if not os.path.exists(file_path):
+            return jsonify({"error": "File not found"}), 404
+        
         output_path = predict_and_save(file_path)
         relative_output_path = os.path.relpath(output_path, start=app.config['OUTPUT_FOLDER'])
         
@@ -165,6 +156,7 @@ def analyze_file(upload_id):
         )
         db.add(new_analysis)
         db.commit()
+        db.refresh(new_analysis)
         
         return jsonify({
             "message": "File analyzed successfully", 
@@ -180,22 +172,27 @@ def analyze_file(upload_id):
 @app.route('/api/uploads', methods=['GET'])
 def get_uploads():
     user_id = request.args.get('user_id')
+    if not user_id:
+        return jsonify({"error": "User ID is required"}), 400
+
     db = next(get_db())
-    uploads = db.query(Upload).filter(Upload.user_id == user_id).all()
-    uploads_data = [{
-        "id": upload.id,
-        "filename": upload.filename,
-        "upload_date": upload.upload_date.isoformat(),
-        "file_type": upload.file_type,
-        "file_size": upload.file_size,
-        "analyses": [{
-            "id": analysis.id,
-            "status": analysis.status,
-            "result_path": analysis.result_path
-        } for analysis in upload.analyses]
-    } for upload in uploads]
-    db.close()
-    return jsonify(uploads_data)
+    try:
+        uploads = db.query(Upload).filter(Upload.user_id == user_id).all()
+        uploads_data = [{
+            "id": upload.id,
+            "filename": upload.filename,
+            "upload_date": upload.upload_date.isoformat(),
+            "file_type": upload.file_type,
+            "file_size": upload.file_size,
+            "analyses": [{
+                "id": analysis.id,
+                "status": analysis.status,
+                "result_path": analysis.result_path
+            } for analysis in upload.analyses]
+        } for upload in uploads]
+        return jsonify(uploads_data)
+    finally:
+        db.close()
 
 @app.route('/api/subscribe', methods=['POST'])
 def subscribe():
