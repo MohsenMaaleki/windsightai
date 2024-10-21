@@ -10,7 +10,7 @@ from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 UPLOAD_FOLDER = 'uploads'
 OUTPUT_FOLDER = 'output'
@@ -279,3 +279,4 @@ def output_file(filename):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
