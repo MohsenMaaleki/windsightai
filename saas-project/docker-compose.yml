@@ -1,26 +1,14 @@
 version: '3.8'
+
 services:
   backend:
     build: ./backend
     ports:
       - "5000:5000"
     environment:
-<<<<<<< HEAD
-      - DATABASE_URL=${DATABASE_URL:-postgresql://user:password@db:5432/windsightai_db}
-      - FLASK_ENV=${FLASK_ENV:-production}
-      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-https://161.35.218.169}
-      - SECRET_KEY=${SECRET_KEY}
-      - UPLOAD_FOLDER=/app/uploads
-      - OUTPUT_FOLDER=/app/output
-      - MAX_CONTENT_LENGTH=16777216
-    volumes:
-      - uploads_data:/app/uploads
-      - output_data:/app/output
-=======
       - DATABASE_URL=postgresql://user:password@db:5432/windsightai_db
       - FLASK_ENV=production
-      - CORS_ALLOWED_ORIGINS=https://161.35.218.169
->>>>>>> bc23358d5b12c511160b4b1ae023b18811f890d8
+      - CORS_ALLOWED_ORIGINS=http://161.35.218.169
     depends_on:
       - db
     networks:
@@ -38,9 +26,9 @@ services:
   db:
     image: postgres:13
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:-user}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
-      - POSTGRES_DB=${POSTGRES_DB:-windsightai_db}
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=windsightai_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -50,8 +38,6 @@ services:
 
 volumes:
   postgres_data:
-  uploads_data:
-  output_data:
 
 networks:
   app-network:

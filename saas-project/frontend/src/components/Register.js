@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Box, VStack, Heading, Input, Button, useToast, Text } from '@chakra-ui/react';
+import { Box, VStack, Heading, Input, Button, useToast } from '@chakra-ui/react';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -15,7 +15,7 @@ const Register = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await axios.post('https://161.35.218.169:5000/api/register', { username, email, password });
+      await axios.post('http://161.35.218.169:5000/api/register', { username, email, password });
       toast({
         title: 'Registration successful',
         description: 'You can now log in with your new account.',
@@ -64,9 +64,6 @@ const Register = () => {
             onChange={(e) => setPassword(e.target.value)}
             isRequired
           />
-          <Text fontSize="sm" color="gray.600">
-            Password must contain at least one letter, one number, one special character (@$!%*#?&), and be at least 8 characters long.
-          </Text>
           <Button 
             type="submit" 
             colorScheme="blue" 

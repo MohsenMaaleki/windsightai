@@ -2,7 +2,6 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, F
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
-import bcrypt
 
 Base = declarative_base()
 
@@ -12,33 +11,12 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
-    password_hash = Column(String(60), nullable=False)  # BCrypt hash is always 60 chars
+    password_hash = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     last_login = Column(DateTime)
 
     uploads = relationship('Upload', back_populates='user')
     subscriptions = relationship('Subscription', back_populates='user')
-
-    @staticmethod
-    def hash_password(password: str) -> str:
-        """Hash a password using bcrypt"""
-        salt = bcrypt.gensalt(rounds=12)  # Work factor of 12 is good for most uses
-        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
-        return hashed.decode('utf-8')
-
-    def verify_password(self, password: str) -> bool:
-        """Verify a password against the hash"""
-        try:
-            return bcrypt.checkpw(
-                password.encode('utf-8'),
-                self.password_hash.encode('utf-8')
-            )
-        except Exception:
-            return False
-
-    def __repr__(self):
-        return f"<User(username='{self.username}', email='{self.email}')>"
-
 
 class Upload(Base):
     __tablename__ = 'uploads'
@@ -54,10 +32,6 @@ class Upload(Base):
     user = relationship('User', back_populates='uploads')
     analyses = relationship('Analysis', back_populates='upload')
 
-    def __repr__(self):
-        return f"<Upload(filename='{self.filename}', user_id={self.user_id})>"
-
-
 class Analysis(Base):
     __tablename__ = 'analyses'
 
@@ -67,11 +41,7 @@ class Analysis(Base):
     status = Column(String, nullable=False)
     result_path = Column(String)
     analysis_metadata = Column(JSON)  
-    
     upload = relationship('Upload', back_populates='analyses')
-
-    def __repr__(self):
-        return f"<Analysis(upload_id={self.upload_id}, status='{self.status}')>"
 
 
 class Subscription(Base):
@@ -85,6 +55,3 @@ class Subscription(Base):
     status = Column(String, nullable=False)
 
     user = relationship('User', back_populates='subscriptions')
-
-    def __repr__(self):
-        return f"<Subscription(user_id={self.user_id}, plan_type='{self.plan_type}', status='{self.status}')>"

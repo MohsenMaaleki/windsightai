@@ -16,7 +16,7 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await axios.post('https://161.35.218.169:5000/api/login', 
+      const response = await axios.post('http://161.35.218.169:5000/api/login', 
         { username, password },
         { 
           withCredentials: true,
