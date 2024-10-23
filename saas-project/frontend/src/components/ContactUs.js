@@ -27,7 +27,7 @@ const ContactUs = () => {
 
     try {
       // Replace with your actual API endpoint
-      await axios.post('http://161.35.218.169:5000/api/contact', { name, email, message });
+      await axios.post('https://161.35.218.169:5000/api/contact', { name, email, message });
       
       toast({
         title: 'Message sent!',

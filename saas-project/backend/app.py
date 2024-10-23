@@ -8,10 +8,29 @@ from database import init_db, get_db
 from db_models import User, Upload, Analysis, Subscription
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timedelta
+import logging
+from logging.handlers import RotatingFileHandler
+import re
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')  # Use environment variable for secret key
 
+# CORS configuration
+CORS(app, resources={r"/api/*": {"origins": os.environ.get('ALLOWED_ORIGINS', 'https://your-frontend-domain.com')}}, supports_credentials=True)
+
+# Configure logging
+if not os.path.exists('logs'):
+    os.makedirs('logs')
+file_handler = RotatingFileHandler('logs/app.log', maxBytes=10240, backupCount=10)
+file_handler.setFormatter(logging.Formatter(
+    '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+))
+file_handler.setLevel(logging.INFO)
+app.logger.addHandler(file_handler)
+app.logger.setLevel(logging.INFO)
+app.logger.info('WindSightAI startup')
+
+# Configuration
 UPLOAD_FOLDER = 'uploads'
 OUTPUT_FOLDER = 'output'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'avi'}
@@ -19,18 +38,34 @@ MODEL_PATH = os.path.join(os.path.dirname(__file__), 'best.pt')
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
+# Password validation regex
+PASSWORD_PATTERN = re.compile(
+    r'^(?=.*[A-Za-z])'  # At least one letter
+    r'(?=.*\d)'         # At least one digit
+    r'(?=.*[~`!@#$%^&*()+=\-_{}\[\]|:;"\'<>,.?/])'  # At least one special character
+    r'[A-Za-z\d~`!@#$%^&*()+=\-_{}\[\]|:;"\'<>,.?/]{8,}$'  # Valid character set and minimum length
+)
+
+# Create necessary folders
 for folder in [UPLOAD_FOLDER, OUTPUT_FOLDER]:
     if not os.path.exists(folder):
         os.makedirs(folder)
 
-# Initialize the database
-init_db()
-
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def validate_password(password: str) -> tuple[bool, str]:
+    """Validate password strength"""
+    if len(password) < 8:
+        return False, "Password must be at least 8 characters long"
+    if not PASSWORD_PATTERN.match(password):
+        return False, "Password must contain at least one letter, one number, and one special character"
+    return True, "Password is valid"
+
 def predict_and_save(file_path: str, model_path: str = MODEL_PATH, output_dir: str = OUTPUT_FOLDER) -> str:
+    """Predict using YOLO model and save results"""
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     
@@ -60,34 +95,80 @@ def predict_and_save(file_path: str, model_path: str = MODEL_PATH, output_dir: s
     
     return str(output_path)
 
-
 @app.route('/api/register', methods=['POST'])
 def register():
+    """Register a new user"""
+    # Validate request data
     data = request.json
+    if not all(key in data for key in ['username', 'email', 'password']):
+        return jsonify({"error": "Missing required fields"}), 400
+    
+    # Validate password strength
+    is_valid, message = validate_password(data['password'])
+    if not is_valid:
+        return jsonify({"error": message}), 400
+
+    # Validate email format
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", data['email']):
+        return jsonify({"error": "Invalid email format"}), 400
+
+    # Initialize database connection
     db = next(get_db())
     try:
+        # Hash the password before storing
+        hashed_password = User.hash_password(data['password'])
+        
+        # Create new user instance
         new_user = User(
             username=data['username'],
             email=data['email'],
-            password_hash=data['password']  # In a real app, hash this password
+            password_hash=hashed_password
         )
+        
+        # Add and commit to database
         db.add(new_user)
         db.commit()
-        return jsonify({"message": "User registered successfully", "user_id": new_user.id}), 201
-    except IntegrityError:
+        
+        # Log successful registration
+        app.logger.info(f"New user registered: {new_user.username}")
+        
+        # Return success response
+        return jsonify({
+            "message": "User registered successfully",
+            "user_id": new_user.id
+        }), 201
+        
+    except IntegrityError as e:
+        # Handle duplicate username/email
         db.rollback()
+        if 'username' in str(e.orig):
+            return jsonify({"error": "Username already exists"}), 400
+        elif 'email' in str(e.orig):
+            return jsonify({"error": "Email already exists"}), 400
         return jsonify({"error": "Username or email already exists"}), 400
+        
+    except Exception as e:
+        # Handle unexpected errors
+        db.rollback()
+        app.logger.error(f"Registration error: {str(e)}")
+        return jsonify({"error": "An unexpected error occurred"}), 500
+        
     finally:
+        # Always close the database connection
         db.close()
 
 @app.route('/api/login', methods=['POST'])
 def login():
+    """Log in a user"""
     data = request.json
+    if not all(key in data for key in ['username', 'password']):
+        return jsonify({"error": "Missing username or password"}), 400
+
     app.logger.info(f"Login attempt for username: {data.get('username')}")
     db = next(get_db())
     try:
         user = db.query(User).filter(User.username == data['username']).first()
-        if user and user.password_hash == data['password']:  # In a real app, verify the hashed password
+        if user and user.verify_password(data['password']):
             user.last_login = datetime.utcnow()
             db.add(user)
             db.commit()
@@ -108,47 +189,58 @@ def login():
 
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
+    """Upload a file for analysis"""
     user_id = request.form.get('user_id')
     if not user_id:
         return jsonify({"error": "User ID is required"}), 400
 
     if 'file' not in request.files:
         return jsonify({"error": "No file part"}), 400
+    
     file = request.files['file']
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
+    
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(file_path)
-        
-        db = next(get_db())
         try:
-            new_upload = Upload(
-                user_id=user_id,
-                filename=filename,
-                original_path=file_path,
-                file_type=file.content_type,
-                file_size=os.path.getsize(file_path)
-            )
-            db.add(new_upload)
-            db.commit()
-            db.refresh(new_upload)
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
             
-            return jsonify({
-                "message": "File uploaded successfully", 
-                "filename": filename, 
-                "upload_id": new_upload.id
-            }), 201
+            db = next(get_db())
+            try:
+                new_upload = Upload(
+                    user_id=user_id,
+                    filename=filename,
+                    original_path=file_path,
+                    file_type=file.content_type,
+                    file_size=os.path.getsize(file_path)
+                )
+                db.add(new_upload)
+                db.commit()
+                db.refresh(new_upload)
+                
+                app.logger.info(f"File uploaded successfully: {filename} by user {user_id}")
+                return jsonify({
+                    "message": "File uploaded successfully", 
+                    "filename": filename, 
+                    "upload_id": new_upload.id
+                }), 201
+            except Exception as e:
+                db.rollback()
+                app.logger.error(f"Database error during upload: {str(e)}")
+                return jsonify({"error": str(e)}), 500
+            finally:
+                db.close()
         except Exception as e:
-            db.rollback()
-            return jsonify({"error": str(e)}), 500
-        finally:
-            db.close()
+            app.logger.error(f"File saving error: {str(e)}")
+            return jsonify({"error": "Error saving file"}), 500
+            
     return jsonify({"error": "File type not allowed"}), 400
 
 @app.route('/api/analyze/<int:upload_id>', methods=['POST'])
 def analyze_file(upload_id):
+    """Analyze an uploaded file"""
     db = next(get_db())
     try:
         upload = db.query(Upload).get(upload_id)
@@ -193,6 +285,7 @@ def analyze_file(upload_id):
 
 @app.route('/api/uploads', methods=['GET'])
 def get_uploads():
+    """Get all uploads for a user"""
     user_id = request.args.get('user_id')
     if not user_id:
         return jsonify({"error": "User ID is required"}), 400
@@ -213,19 +306,25 @@ def get_uploads():
             } for analysis in upload.analyses]
         } for upload in uploads]
         return jsonify(uploads_data)
+    except Exception as e:
+        app.logger.error(f"Error fetching uploads: {str(e)}")
+        return jsonify({"error": "Failed to fetch uploads"}), 500
     finally:
         db.close()
 
 @app.route('/api/subscribe', methods=['POST'])
 def subscribe():
+    """Subscribe a user to a plan"""
     data = request.json
+    if not data or 'user_id' not in data or 'plan_type' not in data:
+        return jsonify({"error": "Missing required fields"}), 400
+
     db = next(get_db())
     try:
         user = db.query(User).get(data['user_id'])
         if not user:
             return jsonify({"error": "User not found"}), 404
 
-        # Check if user already has an active subscription
         active_subscription = db.query(Subscription).filter(
             Subscription.user_id == user.id,
             Subscription.status == 'active'
@@ -234,25 +333,31 @@ def subscribe():
         if active_subscription:
             return jsonify({"error": "User already has an active subscription"}), 400
 
-        # Create new subscription
         new_subscription = Subscription(
             user_id=user.id,
             plan_type=data['plan_type'],
             start_date=datetime.utcnow(),
-            end_date=datetime.utcnow() + timedelta(days=30),  # Assuming 30-day subscription
+            end_date=datetime.utcnow() + timedelta(days=30),
             status='active'
         )
         db.add(new_subscription)
         db.commit()
-        return jsonify({"message": "Subscription created successfully", "subscription_id": new_subscription.id}), 201
+        
+        app.logger.info(f"New subscription created for user {user.id}")
+        return jsonify({
+            "message": "Subscription created successfully",
+            "subscription_id": new_subscription.id
+        }), 201
     except Exception as e:
         db.rollback()
+        app.logger.error(f"Subscription error: {str(e)}")
         return jsonify({"error": str(e)}), 500
     finally:
         db.close()
 
 @app.route('/api/subscription/<int:user_id>', methods=['GET'])
 def get_subscription(user_id):
+    """Get active subscription for a user"""
     db = next(get_db())
     try:
         subscription = db.query(Subscription).filter(
@@ -275,6 +380,7 @@ def get_subscription(user_id):
 
 @app.route('/api/cancel_subscription/<int:subscription_id>', methods=['POST'])
 def cancel_subscription(subscription_id):
+    """Cancel a subscription"""
     db = next(get_db())
     try:
         subscription = db.query(Subscription).get(subscription_id)
@@ -284,39 +390,80 @@ def cancel_subscription(subscription_id):
         subscription.status = 'cancelled'
         subscription.end_date = datetime.utcnow()
         db.commit()
+        
+        app.logger.info(f"Subscription {subscription_id} cancelled")
         return jsonify({"message": "Subscription cancelled successfully"})
     except Exception as e:
         db.rollback()
+        app.logger.error(f"Error cancelling subscription: {str(e)}")
         return jsonify({"error": str(e)}), 500
     finally:
         db.close()
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
+    """Serve uploaded files"""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 @app.route('/output/<filename>')
 def output_file(filename):
+    """Serve output files"""
     return send_from_directory(app.config['OUTPUT_FOLDER'], filename)
 
 def init_db():
+    """Initialize database with test user if needed"""
     db = next(get_db())
     try:
-        # Check if any users exist
         user_count = db.query(User).count()
         if user_count == 0:
-            # Create a test user
-            test_user = User(username='test', email='test@example.com', password_hash='test')
+            test_password = "TestPass123!"
+            test_user = User(
+                username='test',
+                email='test@example.com',
+                password_hash=User.hash_password(test_password)
+            )
             db.add(test_user)
             db.commit()
-            print("Test user created")
+            app.logger.info("Test user created with hashed password")
+            print("Test user created with hashed password")
     except Exception as e:
+        app.logger.error(f"Error initializing database: {str(e)}")
         print(f"Error initializing database: {str(e)}")
     finally:
         db.close()
 
-# Call this function when your app starts
+# Error handlers
+@app.errorhandler(404)
+def not_found_error(error):
+    return jsonify({"error": "Resource not found"}), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    db = next(get_db())
+    db.rollback()
+    db.close()
+    app.logger.error(f'Server Error: {error}')
+    return jsonify({"error": "Internal server error"}), 500
+
+@app.errorhandler(413)
+def too_large(error):
+    return jsonify({"error": "File is too large"}), 413
+
+# Initialize the database when the app starts
 init_db()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Set up logging for production
+    if not app.debug:
+        if not os.path.exists('logs'):
+            os.mkdir('logs')
+        file_handler = RotatingFileHandler('logs/windsightai.log', maxBytes=10240, backupCount=10)
+        file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+        ))
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
+        app.logger.setLevel(logging.INFO)
+        app.logger.info('WindSightAI startup')
+    
+    app.run(host='0.0.0.0', debug=False, ssl_context='adhoc')
