@@ -15,9 +15,12 @@ import re
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')  # Use environment variable for secret key
 
+<<<<<<< HEAD
 # CORS configuration
 CORS(app, resources={r"/api/*": {"origins": os.environ.get('ALLOWED_ORIGINS', 'https://your-frontend-domain.com')}}, supports_credentials=True)
 
+=======
+>>>>>>> bc23358d5b12c511160b4b1ae023b18811f890d8
 # Configure logging
 if not os.path.exists('logs'):
     os.makedirs('logs')
@@ -30,7 +33,10 @@ app.logger.addHandler(file_handler)
 app.logger.setLevel(logging.INFO)
 app.logger.info('WindSightAI startup')
 
+<<<<<<< HEAD
 # Configuration
+=======
+>>>>>>> bc23358d5b12c511160b4b1ae023b18811f890d8
 UPLOAD_FOLDER = 'uploads'
 OUTPUT_FOLDER = 'output'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'avi'}
@@ -39,6 +45,18 @@ MODEL_PATH = os.path.join(os.path.dirname(__file__), 'best.pt')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+<<<<<<< HEAD
+=======
+
+# Password validation regex
+PASSWORD_PATTERN = re.compile(
+    r'^(?=.*[A-Za-z])'  # At least one letter
+    r'(?=.*\d)'         # At least one digit
+    r'(?=.*[~`!@#$%^&*()+=\-_{}\[\]|:;"\'<>,.?/])'  # At least one special character
+    r'[A-Za-z\d~`!@#$%^&*()+=\-_{}\[\]|:;"\'<>,.?/]{8,}$'  # Valid character set and minimum length
+)
+
+>>>>>>> bc23358d5b12c511160b4b1ae023b18811f890d8
 
 # Password validation regex
 PASSWORD_PATTERN = re.compile(
@@ -57,7 +75,25 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def validate_password(password: str) -> tuple[bool, str]:
+<<<<<<< HEAD
     """Validate password strength"""
+=======
+    """
+    Validate password strength with expanded special characters support.
+    
+    Requirements:
+    - At least 8 characters long
+    - At least one letter (a-z or A-Z)
+    - At least one number (0-9)
+    - At least one special character from: ~`!@#$%^&*()+=_-{}[]|:;"'<>,.?/
+    
+    Args:
+        password (str): The password to validate
+    
+    Returns:
+        tuple[bool, str]: (is_valid, message)
+    """
+>>>>>>> bc23358d5b12c511160b4b1ae023b18811f890d8
     if len(password) < 8:
         return False, "Password must be at least 8 characters long"
     if not PASSWORD_PATTERN.match(password):
@@ -103,7 +139,11 @@ def register():
     if not all(key in data for key in ['username', 'email', 'password']):
         return jsonify({"error": "Missing required fields"}), 400
     
+<<<<<<< HEAD
     # Validate password strength
+=======
+    # Validate password
+>>>>>>> bc23358d5b12c511160b4b1ae023b18811f890d8
     is_valid, message = validate_password(data['password'])
     if not is_valid:
         return jsonify({"error": message}), 400
@@ -112,13 +152,19 @@ def register():
     if not re.match(r"[^@]+@[^@]+\.[^@]+", data['email']):
         return jsonify({"error": "Invalid email format"}), 400
 
+<<<<<<< HEAD
     # Initialize database connection
+=======
+>>>>>>> bc23358d5b12c511160b4b1ae023b18811f890d8
     db = next(get_db())
     try:
         # Hash the password before storing
         hashed_password = User.hash_password(data['password'])
         
+<<<<<<< HEAD
         # Create new user instance
+=======
+>>>>>>> bc23358d5b12c511160b4b1ae023b18811f890d8
         new_user = User(
             username=data['username'],
             email=data['email'],
@@ -129,23 +175,32 @@ def register():
         db.add(new_user)
         db.commit()
         
+<<<<<<< HEAD
         # Log successful registration
         app.logger.info(f"New user registered: {new_user.username}")
         
         # Return success response
+=======
+        app.logger.info(f"New user registered: {new_user.username}")
+>>>>>>> bc23358d5b12c511160b4b1ae023b18811f890d8
         return jsonify({
             "message": "User registered successfully",
             "user_id": new_user.id
         }), 201
+<<<<<<< HEAD
         
     except IntegrityError as e:
         # Handle duplicate username/email
+=======
+    except IntegrityError as e:
+>>>>>>> bc23358d5b12c511160b4b1ae023b18811f890d8
         db.rollback()
         if 'username' in str(e.orig):
             return jsonify({"error": "Username already exists"}), 400
         elif 'email' in str(e.orig):
             return jsonify({"error": "Email already exists"}), 400
         return jsonify({"error": "Username or email already exists"}), 400
+<<<<<<< HEAD
         
     except Exception as e:
         # Handle unexpected errors
@@ -153,6 +208,12 @@ def register():
         app.logger.error(f"Registration error: {str(e)}")
         return jsonify({"error": "An unexpected error occurred"}), 500
         
+=======
+    except Exception as e:
+        db.rollback()
+        app.logger.error(f"Registration error: {str(e)}")
+        return jsonify({"error": "An unexpected error occurred"}), 500
+>>>>>>> bc23358d5b12c511160b4b1ae023b18811f890d8
     finally:
         # Always close the database connection
         db.close()
@@ -416,7 +477,12 @@ def init_db():
     try:
         user_count = db.query(User).count()
         if user_count == 0:
+<<<<<<< HEAD
             test_password = "TestPass123!"
+=======
+            # Create a test user with hashed password
+            test_password = "TestPass123!"  # More secure default password
+>>>>>>> bc23358d5b12c511160b4b1ae023b18811f890d8
             test_user = User(
                 username='test',
                 email='test@example.com',
@@ -466,4 +532,9 @@ if __name__ == '__main__':
         app.logger.setLevel(logging.INFO)
         app.logger.info('WindSightAI startup')
     
+<<<<<<< HEAD
     app.run(host='0.0.0.0', debug=False, ssl_context='adhoc')
+=======
+    app.run(host='0.0.0.0', debug=True)
+
+>>>>>>> bc23358d5b12c511160b4b1ae023b18811f890d8
