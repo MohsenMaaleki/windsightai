@@ -15,7 +15,7 @@ const Register = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await axios.post('http://161.35.218.169:5000/api/register', { username, email, password });
+      await axios.post('https://161.35.218.169:5000/api/register', { username, email, password });
       toast({
         title: 'Registration successful',
         description: 'You can now log in with your new account.',

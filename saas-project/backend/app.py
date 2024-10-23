@@ -37,7 +37,13 @@ app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Password validation regex
-PASSWORD_PATTERN = re.compile(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$')
+PASSWORD_PATTERN = re.compile(
+    r'^(?=.*[A-Za-z])'  # At least one letter
+    r'(?=.*\d)'         # At least one digit
+    r'(?=.*[~`!@#$%^&*()+=\-_{}\[\]|:;"\'<>,.?/])'  # At least one special character
+    r'[A-Za-z\d~`!@#$%^&*()+=\-_{}\[\]|:;"\'<>,.?/]{8,}$'  # Valid character set and minimum length
+)
+
 
 for folder in [UPLOAD_FOLDER, OUTPUT_FOLDER]:
     if not os.path.exists(folder):
@@ -48,8 +54,19 @@ def allowed_file(filename):
 
 def validate_password(password: str) -> tuple[bool, str]:
     """
-    Validate password strength
-    Returns: (is_valid, message)
+    Validate password strength with expanded special characters support.
+    
+    Requirements:
+    - At least 8 characters long
+    - At least one letter (a-z or A-Z)
+    - At least one number (0-9)
+    - At least one special character from: ~`!@#$%^&*()+=_-{}[]|:;"'<>,.?/
+    
+    Args:
+        password (str): The password to validate
+    
+    Returns:
+        tuple[bool, str]: (is_valid, message)
     """
     if len(password) < 8:
         return False, "Password must be at least 8 characters long"

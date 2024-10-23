@@ -23,7 +23,7 @@ const Dashboard = () => {
 
   const fetchUploads = async (id) => {
     try {
-      const response = await axios.get(`http://161.35.218.169:5000/api/uploads?user_id=${id}`);
+      const response = await axios.get(`https://161.35.218.169:5000/api/uploads?user_id=${id}`);
       setUploads(response.data);
     } catch (error) {
       console.error('Error fetching uploads:', error);
@@ -61,7 +61,7 @@ const Dashboard = () => {
 
     setIsUploading(true);
     try {
-      await axios.post('http://161.35.218.169:5000/api/upload', formData, {
+      await axios.post('https://161.35.218.169:5000/api/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -92,7 +92,7 @@ const Dashboard = () => {
   const handleAnalyze = async (uploadId) => {
     setIsAnalyzing(prev => ({ ...prev, [uploadId]: true }));
     try {
-      await axios.post(`http://161.35.218.169:5000/api/analyze/${uploadId}`);
+      await axios.post(`https://161.35.218.169:5000/api/analyze/${uploadId}`);
       fetchUploads(userId);
       toast({
         title: 'Analysis completed',
@@ -155,7 +155,7 @@ const Dashboard = () => {
                 <Box flex="1">
                   <Heading size="sm" mb={2}>Original Image</Heading>
                   <Image 
-                    src={`http://161.35.218.169:5000/uploads/${upload.filename}`} 
+                    src={`https://161.35.218.169:5000/uploads/${upload.filename}`} 
                     alt={upload.filename}
                     maxH="300px"
                     objectFit="contain"
@@ -166,7 +166,7 @@ const Dashboard = () => {
                   <Box flex="1" ml={[0, 4]} mt={[4, 0]}>
                     <Heading size="sm" mb={2}>Analyzed Image</Heading>
                     <Image 
-                      src={`http://161.35.218.169:5000/output/${upload.analyses[0].result_path}`}
+                      src={`https://161.35.218.169:5000/output/${upload.analyses[0].result_path}`}
                       alt="Analyzed Image"
                       maxH="300px"
                       objectFit="contain"
