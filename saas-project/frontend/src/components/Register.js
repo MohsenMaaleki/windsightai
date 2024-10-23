@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Box, VStack, Heading, Input, Button, useToast } from '@chakra-ui/react';
+import { Box, VStack, Heading, Input, Button, useToast, Text } from '@chakra-ui/react';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -64,6 +64,9 @@ const Register = () => {
             onChange={(e) => setPassword(e.target.value)}
             isRequired
           />
+          <Text fontSize="sm" color="gray.600">
+            Password must contain at least one letter, one number, one special character (@$!%*#?&), and be at least 8 characters long.
+          </Text>
           <Button 
             type="submit" 
             colorScheme="blue" 
