@@ -1,108 +1,97 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Box,
   VStack,
   Heading,
   Text,
-  Input,
-  Textarea,
-  Button,
-  useToast,
   Container,
-  FormControl,
-  FormLabel,
+  Link,
+  Button,
+  useClipboard,
+  useToast,
+  Icon,
 } from '@chakra-ui/react';
-import axios from 'axios';
+import { FiMail, FiCopy } from 'react-icons/fi';
 
 const ContactUs = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const email = "windsightai@gmail.com";
+  const { hasCopied, onCopy } = useClipboard(email);
   const toast = useToast();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      // Replace with your actual API endpoint
-      await axios.post('http://161.35.218.169:5000/api/contact', { name, email, message });
-      
-      toast({
-        title: 'Message sent!',
-        description: "We've received your message and will get back to you soon.",
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      });
-
-      // Clear form
-      setName('');
-      setEmail('');
-      setMessage('');
-    } catch (error) {
-      toast({
-        title: 'An error occurred.',
-        description: 'Unable to send your message. Please try again later.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleCopy = () => {
+    onCopy();
+    toast({
+      title: "Email copied!",
+      description: "Email address has been copied to clipboard",
+      status: "success",
+      duration: 2000,
+      isClosable: true,
+    });
   };
 
   return (
     <Container maxW="container.md" py={10}>
       <VStack spacing={8} align="stretch">
         <Box textAlign="center">
-          <Heading as="h1" size="xl" mb={2}>Contact Us</Heading>
-          <Text>We'd love to hear from you. Please fill out the form below.</Text>
+          <Heading as="h1" size="xl" mb={4}>Contact Us</Heading>
+          <Text fontSize="lg" color="gray.600" mb={6}>
+            Have questions about WindSightAI? We're here to help!
+          </Text>
+          <Text fontSize="md" color="gray.600" mb={8}>
+            For inquiries about our AI-powered wind turbine inspection system, 
+            partnership opportunities, or any other questions, please reach out to us at:
+          </Text>
         </Box>
 
-        <Box as="form" onSubmit={handleSubmit}>
-          <VStack spacing={4}>
-            <FormControl isRequired>
-              <FormLabel>Name</FormLabel>
-              <Input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Your Name"
-              />
-            </FormControl>
+        <Box 
+          p={8} 
+          bg="blue.50" 
+          borderRadius="lg" 
+          boxShadow="sm"
+          textAlign="center"
+        >
+          <Icon as={FiMail} w={8} h={8} color="blue.500" mb={4} />
+          <Link
+            href={`mailto:${email}`}
+            fontSize="xl"
+            fontWeight="medium"
+            color="blue.600"
+            display="block"
+            mb={4}
+            _hover={{ color: "blue.700" }}
+          >
+            {email}
+          </Link>
+          <Button
+            leftIcon={<FiCopy />}
+            onClick={handleCopy}
+            size="sm"
+            colorScheme="blue"
+            variant="outline"
+          >
+            {hasCopied ? "Copied!" : "Copy Email"}
+          </Button>
+        </Box>
 
-            <FormControl isRequired>
-              <FormLabel>Email</FormLabel>
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Your Email"
-              />
-            </FormControl>
+        <Box textAlign="center" mt={6}>
+          <Text color="gray.600">
+            Our team typically responds within 24-48 business hours. We look forward to hearing from you!
+          </Text>
+        </Box>
 
-            <FormControl isRequired>
-              <FormLabel>Message</FormLabel>
-              <Textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Your Message"
-                rows={6}
-              />
-            </FormControl>
-
-            <Button
-              type="submit"
-              colorScheme="blue"
-              isLoading={isSubmitting}
-              loadingText="Submitting"
-              width="full"
-            >
-              Send Message
-            </Button>
+        <Box 
+          p={6} 
+          bg="gray.50" 
+          borderRadius="md"
+          mt={8}
+        >
+          <Text fontWeight="medium" mb={3}>What you can contact us about:</Text>
+          <VStack align="start" spacing={2} color="gray.600">
+            <Text>• Request a demo of our AI inspection system</Text>
+            <Text>• Learn more about our technology and capabilities</Text>
+            <Text>• Discuss partnership opportunities</Text>
+            <Text>• Get support for existing installations</Text>
+            <Text>• Schedule a consultation with our experts</Text>
           </VStack>
         </Box>
       </VStack>
