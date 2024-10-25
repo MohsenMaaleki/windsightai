@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.dev/svgjs" width="512" height="512"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="248" fill="#3182CE"></circle>
+  <circle cx="256" cy="256" r="240" fill="#4299E1"></circle>
+  
+  <!-- Wind Flow Lines -->
+  <g opacity="0.6">
+    <!-- Animated Wind Curves -->
+    <path d="M20,180 Q100,180 140,160 Q180,140 260,140" fill="none" stroke="#E2E8F0" stroke-width="3">
+      <animate attributeName="d" dur="3s" repeatCount="indefinite" values="
+          M20,180 Q100,180 140,160 Q180,140 260,140;
+          M20,180 Q100,170 140,150 Q180,130 260,130;
+          M20,180 Q100,180 140,160 Q180,140 260,140"></animate>
+    </path>
+    <path d="M40,240 Q120,240 160,220 Q200,200 280,200" fill="none" stroke="#E2E8F0" stroke-width="3">
+      <animate attributeName="d" dur="4s" repeatCount="indefinite" values="
+          M40,240 Q120,240 160,220 Q200,200 280,200;
+          M40,240 Q120,230 160,210 Q200,190 280,190;
+          M40,240 Q120,240 160,220 Q200,200 280,200"></animate>
+    </path>
+    <path d="M10,300 Q90,300 130,280 Q170,260 250,260" fill="none" stroke="#E2E8F0" stroke-width="3">
+      <animate attributeName="d" dur="3.5s" repeatCount="indefinite" values="
+          M10,300 Q90,300 130,280 Q170,260 250,260;
+          M10,300 Q90,290 130,270 Q170,250 250,250;
+          M10,300 Q90,300 130,280 Q170,260 250,260"></animate>
+    </path>
+  </g>
+  
+  <!-- Small Particles -->
+  <g fill="#E2E8F0">
+    <circle cx="100" cy="180" r="2">
+      <animate attributeName="cx" from="100" to="400" dur="4s" repeatCount="indefinite"></animate>
+    </circle>
+    <circle cx="80" cy="240" r="2">
+      <animate attributeName="cx" from="80" to="380" dur="3.5s" repeatCount="indefinite"></animate>
+    </circle>
+    <circle cx="120" cy="300" r="2">
+      <animate attributeName="cx" from="120" to="420" dur="4.5s" repeatCount="indefinite"></animate>
+    </circle>
+  </g>
+
+  <!-- Wind Turbine -->
+  <g transform="translate(256, 256) scale(1.4)">
+    <!-- Tower -->
+    <rect x="-8" y="0" width="16" height="120" fill="#2D3748"></rect>
+    
+    <!-- Base -->
+    <path d="M-20,120 L0,110 L20,120" fill="#2D3748"></path>
+    
+    <!-- Turbine Blades with Connectors -->
+    <g>
+      <!-- Blade 1 -->
+      <path d="M0,0 L-12,-40 Q-24,-100 0,-180 Q24,-100 12,-40 Z" fill="#E2E8F0" transform="rotate(0)">
+        <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="8s" repeatCount="indefinite"></animateTransform>
+      </path>
+      <!-- Blade 2 -->
+      <path d="M0,0 L-12,-40 Q-24,-100 0,-180 Q24,-100 12,-40 Z" fill="#E2E8F0" transform="rotate(120)">
+        <animateTransform attributeName="transform" type="rotate" from="120 0 0" to="480 0 0" dur="8s" repeatCount="indefinite"></animateTransform>
+      </path>
+      <!-- Blade 3 -->
+      <path d="M0,0 L-12,-40 Q-24,-100 0,-180 Q24,-100 12,-40 Z" fill="#E2E8F0" transform="rotate(240)">
+        <animateTransform attributeName="transform" type="rotate" from="240 0 0" to="600 0 0" dur="8s" repeatCount="indefinite"></animateTransform>
+      </path>
+    </g>
+    
+    <!-- Center Hub -->
+    <circle cx="0" cy="0" r="18" fill="#2C5282"></circle>
+  </g>
+  
+  <!-- AI Circuit Pattern -->
+  <g fill="none" stroke="#BEE3F8" stroke-width="2" opacity="0.3">
+    <path d="M40,256 H120 M392,256 H472"></path>
+    <path d="M256,40 V120 M256,392 V472"></path>
+    <circle cx="256" cy="256" r="200" stroke-dasharray="15,15"></circle>
+    <path d="M120,120 L180,180 M332,332 L392,392"></path>
+    <path d="M120,392 L180,332 M332,180 L392,120"></path>
+  </g>
+  
+  <!-- Outer Ring with Gradient -->
+  <circle cx="256" cy="256" r="248" fill="none" stroke="url(#blueGradient)" stroke-width="4"></circle>
+  
+  <!-- Gradients -->
+  <defs>
+    <linearGradient id="SvgjsLinearGradient1010" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#63B3ED;stop-opacity:1"></stop>
+      <stop offset="100%" style="stop-color:#2B6CB0;stop-opacity:1"></stop>
+    </linearGradient>
+  </defs>
+</svg><style>@media (prefers-color-scheme: light) { :root { filter: none; } }
+@media (prefers-color-scheme: dark) { :root { filter: none; } }
+</style></svg>
