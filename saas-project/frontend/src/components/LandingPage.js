@@ -98,7 +98,7 @@ const LandingPage = () => {
                <AspectRatio ratio={16 / 9}>
                  <video
                    controls
-                   src="/videos/demo.mp4"
+                   src="/videos/demo_2.mp4"
                    style={{
                      borderRadius: '8px',
                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
