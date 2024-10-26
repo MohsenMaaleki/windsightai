@@ -17,7 +17,7 @@ const Login = () => {
     setIsLoading(true);
     try {
       var hashedPassword = await bcrypt.hash(password, 10);
-      const response = await axios.post('http://161.35.218.169:5000/api/login', 
+      const response = await axios.post('https://windsightai.com:5000/api/login', 
         { username, hashedPassword },
         { 
           withCredentials: true,

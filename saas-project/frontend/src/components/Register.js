@@ -16,7 +16,7 @@ const Register = () => {
     setIsLoading(true);
     try {
       var hashedPassword = await bcrypt.hash(password, 10);
-      await axios.post('http://161.35.218.169:5000/api/register', { username, email, hashedPassword });
+      await axios.post('https://windsightai.com:5000/api/register', { username, email, hashedPassword });
       toast({
         title: 'Registration successful',
         description: 'You can now log in with your new account.',
