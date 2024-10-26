@@ -16,8 +16,9 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
+      var hashedPassword = await bcrypt.hash(password, 10);
       const response = await axios.post('http://161.35.218.169:5000/api/login', 
-        { username, password },
+        { username, hashedPassword },
         { 
           withCredentials: true,
           headers: {

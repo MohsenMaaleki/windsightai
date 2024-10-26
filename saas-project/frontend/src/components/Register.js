@@ -15,7 +15,8 @@ const Register = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await axios.post('http://161.35.218.169:5000/api/register', { username, email, password });
+      var hashedPassword = await bcrypt.hash(password, 10);
+      await axios.post('http://161.35.218.169:5000/api/register', { username, email, hashedPassword });
       toast({
         title: 'Registration successful',
         description: 'You can now log in with your new account.',
