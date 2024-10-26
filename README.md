@@ -20,7 +20,7 @@ We extend our gratitude to the creators of this dataset for making it available 
 
 ## Website
 
-Visit our project website: [https://windsightai.onrender.com/](https://windsightai.onrender.com/)
+Visit our project website: [(https://windsightai.com/)]((https://windsightai.com/))
 
 ## Future Work
 
