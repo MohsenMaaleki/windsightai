@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Box, VStack, Heading, Input, Button, useToast } from '@chakra-ui/react';
-import bcrypt from 'bcrypt';
+import SHA256 from 'crypto-js/sha256';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -16,7 +16,7 @@ const Register = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      var hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = SHA256(password).toString();
       await axios.post('https://windsightai.com:5000/api/register', { username, email, hashedPassword });
       toast({
         title: 'Registration successful',

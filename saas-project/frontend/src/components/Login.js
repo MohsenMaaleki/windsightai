@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { Box, VStack, Heading, Input, Button, useToast, Text } from '@chakra-ui/react';
 import { useUser } from '../UserContext';
-import bcrypt from 'bcrypt';
+import SHA256 from 'crypto-js/sha256';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -17,7 +17,7 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      var hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = SHA256(password).toString();
       const response = await axios.post('https://windsightai.com:5000/api/login', 
         { username, hashedPassword },
         { 
