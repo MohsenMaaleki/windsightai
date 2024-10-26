@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { Box, VStack, Heading, Input, Button, useToast, Text } from '@chakra-ui/react';
 import { useUser } from '../UserContext';
+import bcrypt from 'bcrypt';
 
 const Login = () => {
   const [username, setUsername] = useState('');

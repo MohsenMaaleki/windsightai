@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Box, VStack, Heading, Input, Button, useToast } from '@chakra-ui/react';
+import bcrypt from 'bcrypt';
 
 const Register = () => {
   const [username, setUsername] = useState('');
