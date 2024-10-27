@@ -18,7 +18,7 @@ const Login = () => {
     setIsLoading(true);
     try {
       const hashedPassword = SHA256(password).toString();
-      const response = await axios.post('http://:5000/api/login', 
+      const response = await axios.post('http://161.35.218.169:5000/api/login', 
         { username, hashedPassword },
         { 
           withCredentials: true,
