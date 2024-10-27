@@ -18,7 +18,7 @@ const Login = () => {
     setIsLoading(true);
     try {
       const hashedPassword = SHA256(password).toString();
-      const response = await axios.post('https://windsightai.com:5000/api/login', 
+      const response = await axios.post('http://windsightai.com:5000/api/login', 
         { username, hashedPassword },
         { 
           withCredentials: true,

@@ -31,7 +31,7 @@ const RequestDemo = () => {
 
     try {
       // Replace with your actual API endpoint
-      await axios.post('https://windsightai.com:5000/api/request-demo', { 
+      await axios.post('http://windsightai.com:5000/api/request-demo', { 
         name, 
         email, 
         company, 

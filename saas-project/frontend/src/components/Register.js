@@ -17,7 +17,7 @@ const Register = () => {
     setIsLoading(true);
     try {
       const hashedPassword = SHA256(password).toString();
-      await axios.post('https://windsightai.com:5000/api/register', { username, email, hashedPassword });
+      await axios.post('http://windsightai.com:5000/api/register', { username, email, hashedPassword });
       toast({
         title: 'Registration successful',
         description: 'You can now log in with your new account.',

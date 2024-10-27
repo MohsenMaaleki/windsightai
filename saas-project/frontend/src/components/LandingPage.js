@@ -186,7 +186,7 @@ const LandingPage = () => {
          <Text fontSize="sm" textAlign="center">
            Model trained on dataset: SHIHAVUDDIN, ASM; Chen, Xiao (2018), "DTU - Drone inspection images of wind turbine", Mendeley Data, V2, doi: 
            <Link 
-             href="https://doi.org/10.17632/hd96prn3nc.2" 
+             href="http://doi.org/10.17632/hd96prn3nc.2" 
              isExternal 
              color="teal.200"
              ml={1}
