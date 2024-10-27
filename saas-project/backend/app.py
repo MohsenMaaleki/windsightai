@@ -69,7 +69,7 @@ def register():
         new_user = User(
             username=data['username'],
             email=data['email'],
-            password_hash=data['password']  # In a real app, hash this password
+            password_hash=data['hashedPassword']  # In a real app, hash this password
         )
         db.add(new_user)
         db.commit()
@@ -87,7 +87,7 @@ def login():
     db = next(get_db())
     try:
         user = db.query(User).filter(User.username == data['username']).first()
-        if user and user.password_hash == data['password']:  # In a real app, verify the hashed password
+        if user and user.password_hash == data['hashedPassword']:  # In a real app, verify the hashed password
             user.last_login = datetime.utcnow()
             db.add(user)
             db.commit()
