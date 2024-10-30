@@ -15,30 +15,67 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    try {
-      const hashedPassword = SHA256(password).toString();
-      await axios.post('https://161.35.218.169:5000/api/register', 
-        { username, email, hashedPassword },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true
-        }
-      );
+
+    // Ensure password is not empty before hashing
+    if (!password) {
       toast({
-        title: 'Registration successful',
-        description: 'You can now log in with your new account.',
-        status: 'success',
+        title: 'Error',
+        description: 'Password is required',
+        status: 'error',
         duration: 3000,
         isClosable: true,
       });
-      navigate('/login');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const hashedPassword = SHA256(password).toString();
+      const response = await axios.post(
+        'https://161.35.218.169:5000/api/register', 
+        { 
+          username, 
+          email, 
+          hashedPassword 
+        },
+        {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          timeout: 10000 // 10 second timeout
+        }
+      );
+
+      if (response.data) {
+        toast({
+          title: 'Registration successful',
+          description: 'You can now log in with your new account.',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+        navigate('/login');
+      }
     } catch (error) {
       console.error('Registration failed:', error);
+      let errorMessage = 'An unexpected error occurred';
+
+      if (error.response) {
+        // Server responded with an error
+        errorMessage = error.response.data?.error || 'Registration failed';
+      } else if (error.request) {
+        // Request was made but no response
+        errorMessage = 'Unable to reach the server. Please check your connection and try again.';
+      } else {
+        // Error in request setup
+        errorMessage = 'Error setting up the request. Please try again.';
+      }
+
       toast({
         title: 'Registration failed',
-        description: error.response?.data?.error || 'An unexpected error occurred',
+        description: errorMessage,
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -59,6 +96,8 @@ const Register = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             isRequired
+            minLength={3}
+            maxLength={50}
           />
           <Input
             type="email"
@@ -73,6 +112,7 @@ const Register = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             isRequired
+            minLength={6}
           />
           <Button 
             type="submit" 
@@ -80,6 +120,7 @@ const Register = () => {
             width="full"
             isLoading={isLoading}
             loadingText="Registering"
+            disabled={!username || !email || !password}
           >
             Register
           </Button>

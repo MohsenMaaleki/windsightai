@@ -10,7 +10,8 @@ services:
       - FLASK_ENV=production
       - CORS_ALLOWED_ORIGINS=https://windsightai.com
     volumes:
-      - ./ssl:/etc/ssl/private  # Mount SSL certificates
+      - ./ssl:/app/ssl:ro  # Changed mount point to /app/ssl and made it read-only
+    command: gunicorn --certfile=/app/ssl/fullchain.pem --keyfile=/app/ssl/privkey.pem -b 0.0.0.0:5000 app:app  # Added gunicorn command with SSL
     depends_on:
       - db
     networks:

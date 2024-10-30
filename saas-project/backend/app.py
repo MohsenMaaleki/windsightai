@@ -10,7 +10,13 @@ from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
+CORS(app, 
+     resources={r"/api/*": {
+         "origins": ["https://windsightai.com"],
+         "methods": ["GET", "POST", "OPTIONS"],
+         "allow_headers": ["Content-Type", "Authorization"],
+         "supports_credentials": True
+     }})
 
 UPLOAD_FOLDER = 'uploads'
 OUTPUT_FOLDER = 'output'
