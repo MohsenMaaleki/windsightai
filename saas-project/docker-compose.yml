@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     build: ./backend
@@ -8,7 +6,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/windsightai_db
       - FLASK_ENV=production
-      - CORS_ALLOWED_ORIGINS=http://localhost,https://windsightai.com
+      - CORS_ALLOWED_ORIGINS=http://localhost
     depends_on:
       - db
     networks:
@@ -25,6 +23,7 @@ services:
       - backend
     networks:
       - app-network
+    restart: always
 
   db:
     image: postgres:13
