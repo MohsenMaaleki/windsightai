@@ -8,11 +8,14 @@ services:
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/windsightai_db
       - FLASK_ENV=production
-      - CORS_ALLOWED_ORIGINS=161.35.218.169
+      - CORS_ALLOWED_ORIGINS=http://localhost,https://windsightai.com
     depends_on:
       - db
     networks:
       - app-network
+    volumes:
+      - ./uploads:/app/uploads
+      - ./output:/app/output
 
   frontend:
     build: ./frontend
@@ -38,6 +41,8 @@ services:
 
 volumes:
   postgres_data:
+  uploads:
+  output:
 
 networks:
   app-network:
