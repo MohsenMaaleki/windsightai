@@ -1,6 +1,69 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Box, VStack, Heading, Input, Button, Image, Text, HStack, useToast, Flex } from '@chakra-ui/react';
+import { 
+  Box, 
+  VStack, 
+  Heading, 
+  Input, 
+  Button, 
+  Image, 
+  Text, 
+  useToast, 
+  Flex,
+  Spinner,
+  Alert,
+  AlertIcon
+} from '@chakra-ui/react';
+
+// ImageWithFallback Component
+const ImageWithFallback = ({ src, alt, ...props }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const handleLoad = () => {
+    setIsLoading(false);
+    setError(null);
+  };
+
+  const handleError = () => {
+    setIsLoading(false);
+    setError('Failed to load image');
+  };
+
+  return (
+    <Box position="relative" width="100%" height="300px">
+      {isLoading && (
+        <Box 
+          position="absolute" 
+          top="50%" 
+          left="50%" 
+          transform="translate(-50%, -50%)"
+        >
+          <Spinner size="xl" color="blue.500" />
+        </Box>
+      )}
+      
+      {error ? (
+        <Alert status="error" borderRadius="md">
+          <AlertIcon />
+          {error}
+        </Alert>
+      ) : (
+        <Image
+          src={src}
+          alt={alt}
+          onLoad={handleLoad}
+          onError={handleError}
+          maxH="300px"
+          width="100%"
+          objectFit="contain"
+          display={isLoading ? 'none' : 'block'}
+          {...props}
+        />
+      )}
+    </Box>
+  );
+};
 
 const Dashboard = () => {
   const [file, setFile] = useState(null);
@@ -49,6 +112,13 @@ const Dashboard = () => {
       reader.readAsDataURL(selectedFile);
     } else {
       setPreview(null);
+      toast({
+        title: 'Invalid file type',
+        description: 'Please select an image file',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
@@ -118,9 +188,17 @@ const Dashboard = () => {
     <Box maxW="6xl" mx="auto" mt={10} px={4}>
       <Heading mb={5}>Dashboard</Heading>
       <VStack spacing={4} align="stretch">
-        <Input type="file" onChange={handleFileChange} accept="image/*,video/*" />
+        <Input 
+          type="file" 
+          onChange={handleFileChange} 
+          accept="image/*"
+          p={1}
+          border="1px dashed"
+          borderColor="gray.300"
+          borderRadius="md"
+        />
         {preview && (
-          <Image src={preview} alt="Preview" maxH="200px" objectFit="contain" />
+          <ImageWithFallback src={preview} alt="Preview" maxH="200px" objectFit="contain" />
         )}
         <Button 
           onClick={handleUpload} 
@@ -154,28 +232,26 @@ const Dashboard = () => {
               <Flex direction={["column", "row"]} justify="space-between">
                 <Box flex="1">
                   <Heading size="sm" mb={2}>Original Image</Heading>
-                  <Image 
-                    src={`/uploads/${upload.filename}`} 
+                  <ImageWithFallback 
+                    src={`/api/image/upload/${upload.filename}`}
                     alt={upload.filename}
-                    maxH="300px"
-                    objectFit="contain"
                   />
                 </Box>
                 
                 {upload.analyses && upload.analyses.length > 0 && (
                   <Box flex="1" ml={[0, 4]} mt={[4, 0]}>
                     <Heading size="sm" mb={2}>Analyzed Image</Heading>
-                    <Image 
-                      src={`/output/${upload.analyses[0].result_path}`}
+                    <ImageWithFallback 
+                      src={`/api/image/output/${upload.analyses[0].result_path}`}
                       alt="Analyzed Image"
-                      maxH="300px"
-                      objectFit="contain"
                     />
                   </Box>
                 )}
               </Flex>
               
-              <Text fontSize="sm" mt={2}>Uploaded on: {new Date(upload.upload_date).toLocaleString()}</Text>
+              <Text fontSize="sm" mt={2}>
+                Uploaded on: {new Date(upload.upload_date).toLocaleString()}
+              </Text>
             </Box>
           ))
         )}

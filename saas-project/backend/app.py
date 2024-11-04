@@ -1,5 +1,4 @@
 import os
-from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from pathlib import Path
@@ -8,9 +7,13 @@ from database import init_db, get_db
 from db_models import User, Upload, Analysis, Subscription
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timedelta
+from flask import Flask, jsonify, request, send_from_directory, url_for
+
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
+# CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
+
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 UPLOAD_FOLDER = 'uploads'
 OUTPUT_FOLDER = 'output'
@@ -315,8 +318,35 @@ def init_db():
     finally:
         db.close()
 
+
+@app.route('/api/image/upload/<filename>')
+def get_upload_image(filename):
+    try:
+        return send_from_directory(
+            app.config['UPLOAD_FOLDER'], 
+            filename,
+            as_attachment=False,
+            mimetype='image/*'
+        )
+    except Exception as e:
+        return jsonify({"error": f"Error loading image: {str(e)}"}), 404
+
+@app.route('/api/image/output/<filename>')
+def get_output_image(filename):
+    try:
+        return send_from_directory(
+            app.config['OUTPUT_FOLDER'], 
+            filename,
+            as_attachment=False,
+            mimetype='image/*'
+        )
+    except Exception as e:
+        return jsonify({"error": f"Error loading image: {str(e)}"}), 404
+
 # Call this function when your app starts
 init_db()
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
