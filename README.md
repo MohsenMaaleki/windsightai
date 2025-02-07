@@ -51,6 +51,5 @@ Project Link: [https://github.com/MohsenMaaleki/windsightai](https://github.com/
 ## Acknowledgements
 
 - [YOLOv11](https://github.com/ultralytics/ultralytics)
-- [Streamlit](https://streamlit.io/)
 - [OpenCV](https://opencv.org/)
 - [PyTorch](https://pytorch.org/)
